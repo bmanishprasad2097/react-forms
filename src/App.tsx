@@ -17,10 +17,12 @@ const Header = () => {
 
 interface FormProps {
   setGlist: (newItem: GroceryProduct[]) => void;
-  Glist : GroceryProduct[]
+  Glist : GroceryProduct[];
+  totPrice : number;
+  settotPrice: (newItem: number) => void;
 }
 
-const Form : React.FC<FormProps>  = ({setGlist , Glist}) =>{
+const Form : React.FC<FormProps>  = ({setGlist , Glist , totPrice , settotPrice}) =>{
 
   const itemName  = useRef<HTMLInputElement>(null);
   const itemPrice = useRef<HTMLInputElement>(null);
@@ -40,13 +42,12 @@ const Form : React.FC<FormProps>  = ({setGlist , Glist}) =>{
  
         }
         setGlist([...Glist, newItem]);
+        settotPrice(totPrice+ newItem.price * newItem.quantity);
 
           itemName.current.value = '';
           itemPrice.current.value = '';
           itemQuantity.current.value = '';
     }
-    
-    
   }
   
   return (
@@ -78,7 +79,7 @@ const Card = (props : GroceryProduct )=>{
     <div className='ml-2'>
       <div>ID: {props.id}</div>
       <div>Item Name: {props.name}</div>
-      <div>Price: {props.price}</div>
+      <div>Price(INR): {props.price}</div>
       <div>Quantity: {props.quantity}</div>
       <div>
         <button className='border-2 border-[#120624] rounded-md'>Remove</button>
@@ -86,22 +87,17 @@ const Card = (props : GroceryProduct )=>{
     </div>
   )
 }
-let products : GroceryProduct[] = [{
-  id: 1,
-  name: "Milk",
-  price: 100,
-  quantity: 2
-}];
+let products : GroceryProduct[] = [];
 
 const App = () => {
 
   const [ Glist , setGlist] = useState(products)
-  
+  const [totPrice , settotPrice] = useState(0)
   
   return (
     <div>
       <Header />
-      <Form setGlist = {setGlist} Glist = {Glist}/>
+      <Form setGlist = {setGlist} Glist = {Glist} totPrice = {totPrice} settotPrice = {settotPrice}/>
       <div className='text-2xl mb-2'>
         Grocery List
       </div>
@@ -109,6 +105,12 @@ const App = () => {
         {Glist.map((item)=> {
           return <Card key={item.id} {...item}/>
         })}
+      </div>
+      <div className='text-2xl'>
+        Total groceries : {Glist.length}
+      </div> 
+      <div className='text-2xl'>
+        Total price : {totPrice}
       </div>
     </div>
   )
