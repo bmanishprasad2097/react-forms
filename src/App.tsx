@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { FormEvent, useRef, useState } from 'react'
 
 type GroceryProduct  = {
   id: number
@@ -15,21 +15,38 @@ const Header = () => {
   )
 }
 
-const Form = () =>{
-  let listCount : number = 0; 
+interface FormProps {
+  setGlist: (newItem: GroceryProduct[]) => void;
+  Glist : GroceryProduct[]
+}
 
-  const itemName  = useRef<HTMLInputElement>("");
-  const itemPrice = useRef<HTMLInputElement>(0);
-  const itemQuantity = useRef<HTMLInputElement>(0);
+const Form : React.FC<FormProps>  = ({setGlist , Glist}) =>{
 
-  function addItemtoList(){
-    const newItem : GroceryProduct = {
-      id: listCount + 1,
-      name: itemName.current.value,
-      price: itemPrice.current.value,
-      quantity: itemQuantity.current.value
+  const itemName  = useRef<HTMLInputElement>(null);
+  const itemPrice = useRef<HTMLInputElement>(null);
+  const itemQuantity = useRef<HTMLInputElement>(null);
+
+
+  function addItemtoList(e: FormEvent){
+    e.preventDefault();
+    
+    if(itemName.current && itemPrice.current && itemQuantity.current)       
+    {
+        const newItem = {
+          id: Date.now(),
+          name: itemName.current.value,
+          price: parseFloat(itemPrice.current.value),
+          quantity: parseInt(itemQuantity.current.value)
+ 
+        }
+        setGlist([...Glist, newItem]);
+
+          itemName.current.value = '';
+          itemPrice.current.value = '';
+          itemQuantity.current.value = '';
     }
-    listCount++;
+    
+    
   }
   
   return (
@@ -48,7 +65,7 @@ const Form = () =>{
           <input type="text" className='border' ref={itemQuantity} />
         </div>
         <div>
-          <button className=' border-2 border-[#120624] rounded-md'>Add</button>
+          <button type='submit' className=' border-2 border-[#120624] rounded-md'>Add</button>
         </div>
       </form>
     </div>
@@ -78,19 +95,19 @@ let products : GroceryProduct[] = [{
 
 const App = () => {
 
-  const [ Glist , addGlist] = useState(products)
+  const [ Glist , setGlist] = useState(products)
   
   
   return (
     <div>
       <Header />
-      <Form />
+      <Form setGlist = {setGlist} Glist = {Glist}/>
       <div className='text-2xl mb-2'>
         Grocery List
       </div>
       <div>
         {Glist.map((item)=> {
-          return <Card id = {item.id} name = {item.name} price = {item.price} quantity = {item.quantity}/>
+          return <Card key={item.id} {...item}/>
         })}
       </div>
     </div>
