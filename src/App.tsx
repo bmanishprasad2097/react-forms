@@ -73,8 +73,23 @@ const Form : React.FC<FormProps>  = ({setGlist , Glist , totPrice , settotPrice}
   )
 }
 
+interface CardProps {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  totPrice : number;
+  settotPrice: (newItem: number) => void;
+  Glist: GroceryProduct[];
+  setGlist : (items: GroceryProduct[]) => void;
+}
 
-const Card = (props : GroceryProduct )=>{
+const Card : React.FC<CardProps> = (props)=>{
+  
+  function removefromList(){
+    props.setGlist(props.Glist.filter(item=> item.id !== props.id))
+    props.settotPrice(props.totPrice - props.price * props.quantity)
+  }
   return(
     <div className='ml-2'>
       <div>ID: {props.id}</div>
@@ -82,7 +97,7 @@ const Card = (props : GroceryProduct )=>{
       <div>Price(INR): {props.price}</div>
       <div>Quantity: {props.quantity}</div>
       <div>
-        <button className='border-2 border-[#120624] rounded-md'>Remove</button>
+        <button onClick={removefromList} className='border-2 border-[#120624] rounded-md'>Remove</button>
       </div>
     </div>
   )
@@ -103,7 +118,7 @@ const App = () => {
       </div>
       <div>
         {Glist.map((item)=> {
-          return <Card key={item.id} {...item}/>
+          return <Card key={item.id} {...item} totPrice = {totPrice} settotPrice = {settotPrice} setGlist = {setGlist} Glist = {Glist} />
         })}
       </div>
       <div className='text-2xl'>
